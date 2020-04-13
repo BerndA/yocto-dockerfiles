@@ -9,23 +9,32 @@ on:
 jobs:
 
   build:
+    env:
+      DOCKERHUB_REPOSITORY: bernda/yocto-dockerfiles
+      REPO: bernda/yocto-dockerfiles
+      DISTRO_TO_BUILD: ubuntu-18.04
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
+    
     steps:
-      - name: Login to docker hub
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: Build image
+        if: success()
+        run: |
+          ./build_container.sh
+
+      - name: Login to docker hub        
         if: success()
         uses: actions-hub/docker/login@master
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build image
-        if: success()
-        run: docker build -t ${GITHUB_REPOSITORY}:${IMAGE_TAG} dockerfiles/ubuntu/ubuntu-18.04/ubuntu-18.04-base
-
       - name: Push to docker registry
         if: success()
         uses: actions-hub/docker@master
         with:
-          args: push ${GITHUB_REPOSITORY}:${IMAGE_TAG}
-        
+          name: ${DOCKERHUB_REPOSITORY}
+          args: push ${DOCKERHUB_REPOSITORY}:ubuntu-18.04-base
