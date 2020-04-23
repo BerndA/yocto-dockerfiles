@@ -47,6 +47,7 @@ RUN apt-get update && \
     mkdir  /etc/vncskel/.vnc && \
     echo "" | vncpasswd -f > /etc/vncskel/.vnc/passwd && \
     chmod 0600 /etc/vncskel/.vnc/passwd && \
+    useradd -U -m yoctouser && \
     /usr/sbin/locale-gen en_US.UTF-8
 
 COPY build-install-dumb-init.sh /
